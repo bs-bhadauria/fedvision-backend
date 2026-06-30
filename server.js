@@ -112,10 +112,16 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
             subject: "New FedVision Pilot Request (Verified)"
         });
 
-        if (result.statusCode === 200) {
+        const isSuccess = result.statusCode >= 200 && result.statusCode < 300;
+
+        if (!isSuccess) {
+            console.error("Web3Forms API Error:", result.statusCode, result.body);
+        }
+
+        if (isSuccess) {
             res.status(200).json({ success: true, message: "Request received securely!" });
         } else {
-            res.status(500).json({ success: false, message: "Third-party API error." });
+            res.status(500).json({ success: false, message: `Third-party API error: ${result.body}` });
         }
 
     } catch (error) {
